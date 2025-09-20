@@ -57,10 +57,11 @@ body {
   background:#202c33;
   padding:6px;
   padding-bottom:16px; 
+  align-items:center;
 }
 .footer input {
   flex:1;
-  padding:6px;
+  padding:6px 8px;
   border:none;
   border-radius:4px;
   background:#2a3942;
@@ -74,6 +75,7 @@ body {
   padding:0 12px;
   border-radius:4px;
   cursor:pointer;
+  height:36px;
 }
 #userPopup {
   position:fixed;
@@ -140,7 +142,6 @@ body {
 </div>
 
 <div id="stickerPopup">
-  <!-- Broad cat/meme stickers -->
   <img src="https://cataas.com/cat/says/Hi" class="sticker">
   <img src="https://cataas.com/cat/says/Meow" class="sticker">
   <img src="https://cataas.com/cat/says/Fun" class="sticker">
@@ -254,7 +255,7 @@ function updateStatus(){
     const bil = val["Billi"]?"online":"offline";
     const ishTyping = val["Ishu_typing"]?" (typing...)":"";
     const bilTyping = val["Billi_typing"]?" (typing...)":"";
-    statusDiv.textContent = `Ishu: ${ish}${ishTyping} | Billi: ${bil}${bilTyping}`;
+    statusDiv.textContent = `Ishu (${ish}${ishTyping}) | Billi (${bil}${bilTyping})`;
   });
 }
 updateStatus();
