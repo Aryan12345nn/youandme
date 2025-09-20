@@ -76,6 +76,8 @@ body {
   border-radius:4px;
   cursor:pointer;
   height:36px;
+  min-width:36px;
+  font-size:18px;
 }
 #userPopup {
   position:fixed;
@@ -251,11 +253,13 @@ window.addEventListener("beforeunload", () => {
 function updateStatus(){
   onValue(statusRef, snap=>{
     const val = snap.val()||{};
-    const ish = val["Ishu"]?"online":"offline";
-    const bil = val["Billi"]?"online":"offline";
-    const ishTyping = val["Ishu_typing"]?" (typing...)":"";
-    const bilTyping = val["Billi_typing"]?" (typing...)":"";
-    statusDiv.textContent = `Ishu (${ish}${ishTyping}) | Billi (${bil}${bilTyping})`;
+    const users = ["Ishu","Billi"];
+    let statusText = users.map(u=>{
+      const online = val[u]?"online":"offline";
+      const typing = val[u+"_typing"]?" (typing...)":"";
+      return `${u} (${online}${typing})`;
+    }).join(" | ");
+    statusDiv.textContent = statusText;
   });
 }
 updateStatus();
