@@ -1,214 +1,264 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat</title>
-  <style>
-    body {
-      background:#111;
-      font-family:sans-serif;
-      color:#fff;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      height:100vh;
-    }
-    .chat-container {
-      width:360px;
-      height:600px;
-      background:#0b141a;
-      display:flex;
-      flex-direction:column;
-      border-radius:8px;
-      overflow:hidden;
-      box-shadow:0 0 10px rgba(0,0,0,.6);
-    }
-    .header {
-      background:#202c33;
-      padding:10px;
-      text-align:center;
-      font-weight:bold;
-    }
-    .status {
-      font-size:12px;
-      color:#aaa;
-    }
-    .messages {
-      flex:1;
-      overflow-y:auto;
-      padding:10px;
-    }
-    .msg {
-      margin:6px 0;
-      max-width:80%;
-      padding:6px 8px;
-      border-radius:6px;
-      line-height:1.3;
-      word-break:break-word;
-    }
-    .ish {
-      background:#005c4b;
-      align-self:flex-end;
-    }
-    .bil {
-      background:#202c33;
-      align-self:flex-start;
-    }
-    .footer {
-      display:flex;
-      background:#202c33;
-      padding:6px;
-    }
-    .footer input {
-      flex:1;
-      padding:6px;
-      border:none;
-      border-radius:4px;
-      background:#2a3942;
-      color:#fff;
-    }
-    .footer button {
-      margin-left:4px;
-      background:#00a884;
-      border:none;
-      color:#fff;
-      padding:0 12px;
-      border-radius:4px;
-      cursor:pointer;
-    }
-    .user-select {
-      text-align:center;
-      margin-bottom:8px;
-    }
-    select {
-      background:#2a3942;
-      color:#fff;
-      border:none;
-      padding:4px;
-      border-radius:4px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat App</title>
+<style>
+body {
+  background:#111;
+  font-family:sans-serif;
+  color:#fff;
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.chat-container {
+  width:360px;
+  height:600px;
+  background:#0b141a;
+  display:flex;
+  flex-direction:column;
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:0 0 10px rgba(0,0,0,.6);
+  position:relative;
+}
+.header {
+  background:#202c33;
+  padding:10px;
+  text-align:center;
+  font-weight:bold;
+}
+.status {
+  font-size:12px;
+  color:#aaa;
+  margin-top:4px;
+}
+.messages {
+  flex:1;
+  overflow-y:auto;
+  padding:10px;
+}
+.msg {
+  margin:6px 0;
+  max-width:80%;
+  padding:6px 8px;
+  border-radius:6px;
+  line-height:1.3;
+  word-break:break-word;
+}
+.ish { background:#005c4b; align-self:flex-end; }
+.bil { background:#202c33; align-self:flex-start; }
+.footer {
+  display:flex;
+  background:#202c33;
+  padding:6px;
+  padding-bottom:16px;
+}
+.footer input {
+  flex:1;
+  padding:6px;
+  border:none;
+  border-radius:4px;
+  background:#2a3942;
+  color:#fff;
+}
+.footer button {
+  margin-left:4px;
+  background:#00a884;
+  border:none;
+  color:#fff;
+  padding:0 12px;
+  border-radius:4px;
+  cursor:pointer;
+}
+#userPopup {
+  position:fixed;
+  top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0.9);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:100;
+}
+#userPopup h2 { margin-bottom:20px; color:#fff; }
+#userPopup button {
+  margin:10px;
+  padding:12px 24px;
+  background:#00a884;
+  border:none;
+  color:#fff;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:16px;
+}
+#stickerPopup {
+  display:none;
+  position:absolute;
+  bottom:70px;
+  left:0;
+  right:0;
+  background:#202c33;
+  padding:8px;
+  border-radius:8px;
+  display:flex;
+  overflow-x:auto;
+  white-space:nowrap;
+}
+#stickerPopup img {
+  width:60px;
+  margin:4px;
+  cursor:pointer;
+  border-radius:4px;
+  display:inline-block;
+}
+</style>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="header">
-      <div>Chat</div>
-      <div class="status" id="status">Select user…</div>
-    </div>
-    <div class="user-select">
-      <select id="userSelect">
-        <option value="">--Select User--</option>
-        <option value="Ishu">Ishu</option>
-        <option value="Billi">Billi</option>
-      </select>
-    </div>
-    <div class="messages" id="messages"></div>
-    <div class="footer">
-      <input id="msgInput" placeholder="Type a message…" disabled />
-      <button id="sendBtn" disabled>Send</button>
-    </div>
+
+<!-- User selection popup -->
+<div id="userPopup">
+  <h2>Select User</h2>
+  <button onclick="selectUser('Ishu')">Ishu</button>
+  <button onclick="selectUser('Billi')">Billi</button>
+</div>
+
+<!-- Chat container -->
+<div class="chat-container">
+  <div class="header">
+    <div>Chat</div>
+    <div class="status" id="status">Select user…</div>
   </div>
+  <div class="messages" id="messages"></div>
+  <div class="footer">
+    <input id="msgInput" placeholder="Type a message…" disabled />
+    <button id="stickerBtn">😺</button>
+    <button id="sendBtn" disabled>Send</button>
+  </div>
+</div>
+
+<!-- Sticker popup -->
+<div id="stickerPopup">
+  <img src="https://cataas.com/cat/says/Hi" class="sticker">
+  <img src="https://cataas.com/cat/says/Meow" class="sticker">
+  <img src="https://cataas.com/cat/says/Fun" class="sticker">
+  <img src="https://cataas.com/cat/says/Lol" class="sticker">
+  <img src="https://cataas.com/cat/says/Hey" class="sticker">
+  <img src="https://cataas.com/cat/says/Cute" class="sticker">
+  <img src="https://cataas.com/cat/says/Wow" class="sticker">
+  <img src="https://cataas.com/cat/says/Yay" class="sticker">
+</div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-  import { 
-    getDatabase, ref, push, onValue, update, serverTimestamp 
-  } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
-  // === 1. Your Firebase config ===
-  const firebaseConfig = {
-    apiKey: "AIzaSyAyLfQR-k8L45imDdx0N-5pw8P43_pmJ8E",
-    authDomain: "youandme12345-d1d17.firebaseapp.com",
-    projectId: "youandme12345-d1d17",
-    storageBucket: "youandme12345-d1d17.firebasestorage.app",
-    messagingSenderId: "500541583420",
-    appId: "1:500541583420:web:ec35f7355884fb6e345339",
-    // 👇 paste your realtime DB URL here:
-    databaseURL: "https://youandme12345-d1d17-default-rtdb.firebaseio.com/"
-  };
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAyLfQR-k8L45imDdx0N-5pw8P43_pmJ8E",
+  authDomain: "youandme12345-d1d17.firebaseapp.com",
+  projectId: "youandme12345-d1d17",
+  storageBucket: "youandme12345-d1d17.firebasestorage.app",
+  messagingSenderId: "500541583420",
+  appId: "1:500541583420:web:ec35f7355884fb6e345339",
+  databaseURL: "https://youandme12345-d1d17-default-rtdb.firebaseio.com/"
+};
 
-  // === 2. Init Firebase ===
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-  const messagesRef = ref(db, "messages");
-  const typingRef = ref(db, "typing");
+const messagesRef = ref(db, "messages");
+const statusRef = ref(db, "status");
 
-  const messagesDiv = document.getElementById("messages");
-  const input = document.getElementById("msgInput");
-  const sendBtn = document.getElementById("sendBtn");
-  const userSelect = document.getElementById("userSelect");
-  const status = document.getElementById("status");
+const messagesDiv = document.getElementById("messages");
+const input = document.getElementById("msgInput");
+const sendBtn = document.getElementById("sendBtn");
+const stickerBtn = document.getElementById("stickerBtn");
+const statusDiv = document.getElementById("status");
+const popup = document.getElementById("userPopup");
+const stickerPopup = document.getElementById("stickerPopup");
 
-  let currentUser = null;
+let currentUser = null;
 
-  userSelect.addEventListener("change", () => {
-    currentUser = userSelect.value;
-    if (currentUser) {
-      input.disabled = false;
-      sendBtn.disabled = false;
-      status.textContent = `${currentUser} online`;
-      update(typingRef, { [currentUser]: false });
+// User selection
+window.selectUser = function(user){
+  currentUser = user;
+  popup.style.display = "none";
+  input.disabled = false;
+  sendBtn.disabled = false;
+  update(statusRef, {[currentUser]: true});
+}
+
+// Send message
+sendBtn.addEventListener("click", sendMessage);
+input.addEventListener("keydown", e => { if(e.key==='Enter') sendMessage(); });
+function sendMessage(){
+  if(!input.value.trim() || !currentUser) return;
+  push(messagesRef, { user: currentUser, text: input.value.trim(), sticker:"", timestamp: serverTimestamp() });
+  input.value="";
+}
+
+// Typing indicator
+let typingTimeout;
+input.addEventListener("input", ()=>{
+  if(!currentUser) return;
+  update(statusRef, { [currentUser+"_typing"]: true });
+  clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(()=>update(statusRef,{[currentUser+"_typing"]:false}),1500);
+});
+
+// Sticker button
+stickerBtn.addEventListener("click", ()=> {
+  stickerPopup.style.display = stickerPopup.style.display==="none"?"flex":"none";
+});
+
+// Sticker selection
+stickerPopup.querySelectorAll(".sticker").forEach(img=>{
+  img.addEventListener("click", ()=>{
+    if(!currentUser) return;
+    push(messagesRef, {user:currentUser, text:"", sticker:img.src, timestamp: serverTimestamp()});
+    stickerPopup.style.display="none";
+  });
+});
+
+// Display messages
+onValue(messagesRef, snap=>{
+  messagesDiv.innerHTML="";
+  snap.forEach(child=>{
+    const msg = child.val();
+    const div = document.createElement("div");
+    div.classList.add("msg");
+    div.classList.add(msg.user==='Ishu'?'ish':'bil');
+    if(msg.sticker && msg.sticker!==""){
+      div.innerHTML = `<img src="${msg.sticker}" style="width:100px;">`;
     } else {
-      input.disabled = true;
-      sendBtn.disabled = true;
-      status.textContent = `Select user…`;
-    }
-  });
-
-  // === 3. Send message ===
-  sendBtn.addEventListener("click", sendMessage);
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") sendMessage();
-  });
-
-  function sendMessage() {
-    if (!input.value.trim() || !currentUser) return;
-    push(messagesRef, {
-      user: currentUser,
-      text: input.value.trim(),
-      timestamp: serverTimestamp()
-    });
-    input.value = "";
-    update(typingRef, { [currentUser]: false });
-  }
-
-  // === 4. Typing indicator ===
-  let typingTimeout;
-  input.addEventListener("input", () => {
-    if (!currentUser) return;
-    update(typingRef, { [currentUser]: true });
-    clearTimeout(typingTimeout);
-    typingTimeout = setTimeout(() => {
-      update(typingRef, { [currentUser]: false });
-    }, 1500);
-  });
-
-  onValue(typingRef, (snap) => {
-    const val = snap.val() || {};
-    const other = currentUser === "Ishu" ? "Billi" : "Ishu";
-    if (val[other]) {
-      status.textContent = `${other} typing…`;
-    } else if (currentUser) {
-      status.textContent = `${other} online`;
-    }
-  });
-
-  // === 5. Load messages ===
-  onValue(messagesRef, (snap) => {
-    messagesDiv.innerHTML = "";
-    snap.forEach(child => {
-      const msg = child.val();
-      const div = document.createElement("div");
-      div.classList.add("msg");
-      div.classList.add(msg.user === "Ishu" ? "ish" : "bil");
       div.textContent = msg.user + ": " + msg.text;
-      messagesDiv.appendChild(div);
-    });
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+    messagesDiv.appendChild(div);
   });
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+});
 
+// Online/offline & typing status
+window.addEventListener("beforeunload", () => {
+  if(currentUser) update(statusRef,{[currentUser]:false});
+});
+
+function updateStatus(){
+  onValue(statusRef, snap=>{
+    const val = snap.val()||{};
+    const ish = val["Ishu"]?"online":"offline";
+    const bil = val["Billi"]?"online":"offline";
+    const ishTyping = val["Ishu_typing"]?" (typing...)":"";
+    const bilTyping = val["Billi_typing"]?" (typing...)":"";
+    statusDiv.textContent = `Ishu: ${ish}${ishTyping} | Billi: ${bil}${bilTyping}`;
+  });
+}
+updateStatus();
 </script>
 </body>
 </html>
