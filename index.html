@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chat App</title>
+<title>Cat Meme Chat</title>
 <style>
 body {
   background:#111;
@@ -56,7 +56,7 @@ body {
   display:flex;
   background:#202c33;
   padding:6px;
-  padding-bottom:16px;
+  padding-bottom:16px; 
 }
 .footer input {
   flex:1;
@@ -120,17 +120,15 @@ body {
 </head>
 <body>
 
-<!-- User selection popup -->
 <div id="userPopup">
   <h2>Select User</h2>
   <button onclick="selectUser('Ishu')">Ishu</button>
   <button onclick="selectUser('Billi')">Billi</button>
 </div>
 
-<!-- Chat container -->
 <div class="chat-container">
   <div class="header">
-    <div>Chat</div>
+    <div>Cat Meme Chat</div>
     <div class="status" id="status">Select user…</div>
   </div>
   <div class="messages" id="messages"></div>
@@ -141,8 +139,8 @@ body {
   </div>
 </div>
 
-<!-- Sticker popup -->
 <div id="stickerPopup">
+  <!-- Broad cat/meme stickers -->
   <img src="https://cataas.com/cat/says/Hi" class="sticker">
   <img src="https://cataas.com/cat/says/Meow" class="sticker">
   <img src="https://cataas.com/cat/says/Fun" class="sticker">
@@ -151,6 +149,8 @@ body {
   <img src="https://cataas.com/cat/says/Cute" class="sticker">
   <img src="https://cataas.com/cat/says/Wow" class="sticker">
   <img src="https://cataas.com/cat/says/Yay" class="sticker">
+  <img src="https://cataas.com/cat/says/Nice" class="sticker">
+  <img src="https://cataas.com/cat/says/Good" class="sticker">
 </div>
 
 <script type="module">
@@ -170,7 +170,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-
 const messagesRef = ref(db, "messages");
 const statusRef = ref(db, "status");
 
