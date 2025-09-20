@@ -9,11 +9,11 @@
     background:#111;
     font-family:sans-serif;
     color:#fff;
+    margin:0;
+    height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
-    height:100vh;
-    margin:0;
   }
   .chat-container {
     width:360px;
@@ -54,19 +54,19 @@
   .footer input { flex:1; padding:6px; border:none; border-radius:4px; background:#2a3942; color:#fff; }
   .footer button { margin-left:4px; background:#00a884; border:none; color:#fff; padding:0 12px; border-radius:4px; cursor:pointer; }
 
-  /* Overlay for user selection */
-  #overlay {
+  /* Overlay popup */
+  #userPopup {
     position:fixed;
     top:0; left:0; right:0; bottom:0;
-    background:rgba(0,0,0,0.85);
+    background:rgba(0,0,0,0.9);
     display:flex;
     justify-content:center;
     align-items:center;
     flex-direction:column;
     z-index:100;
   }
-  #overlay h2 { margin-bottom:20px; }
-  #overlay button {
+  #userPopup h2 { margin-bottom:20px; color:#fff; }
+  #userPopup button {
     margin:10px;
     padding:12px 24px;
     background:#00a884;
@@ -79,12 +79,15 @@
 </style>
 </head>
 <body>
-<div id="overlay">
+
+<!-- Popup -->
+<div id="userPopup">
   <h2>Select User</h2>
   <button onclick="selectUser('Ishu')">Ishu</button>
   <button onclick="selectUser('Billi')">Billi</button>
 </div>
 
+<!-- Chat -->
 <div class="chat-container">
   <div class="header">
     <div>Chat</div>
@@ -101,7 +104,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
 import { getDatabase, ref, push, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
-// === Firebase config ===
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAyLfQR-k8L45imDdx0N-5pw8P43_pmJ8E",
   authDomain: "youandme12345-d1d17.firebaseapp.com",
@@ -122,14 +125,14 @@ const messagesDiv = document.getElementById("messages");
 const input = document.getElementById("msgInput");
 const sendBtn = document.getElementById("sendBtn");
 const status = document.getElementById("status");
-const overlay = document.getElementById("overlay");
+const popup = document.getElementById("userPopup");
 
 let currentUser = null;
 
-// User selection popup
+// Select user from popup
 window.selectUser = function(user){
   currentUser = user;
-  overlay.style.display = "none";
+  popup.style.display = "none";
   input.disabled = false;
   sendBtn.disabled = false;
   status.textContent = `${currentUser} online`;
@@ -177,4 +180,4 @@ onValue(messagesRef, snap=>{
 });
 </script>
 </body>
-</html>ṭ
+</html>
