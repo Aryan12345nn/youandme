@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WhatsApp Clone</title>
-<link rel="stylesheet" href="styles.css">
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Clone</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -35,21 +34,20 @@
   </div>
 
   <div class="messages" id="messages"></div>
-
-  <div id="chatTyping" class="chat-typing"></div>
+  <div id="chatTyping" class="typing-chat"></div>
 
   <div class="reply-preview" id="replyPreview">
     Replying to: <span id="replyText"></span>
     <button id="cancelReply">X</button>
   </div>
 
+  <div class="sticker-panel" id="stickerPanel"></div>
+
   <div class="input-container">
-    <button id="stickerBtn" class="sticker-btn">😺</button>
     <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off">
+    <button id="stickerBtn" class="sticker-btn">😺</button>
     <button id="sendBtn">Send</button>
   </div>
-
-  <div id="stickerPanel" class="sticker-panel"></div>
 </div>
 
 <script src="app.js"></script>
