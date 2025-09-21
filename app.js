@@ -1,81 +1,102 @@
-// Firebase Config – replace with your own config
+// Prompt for name every time page loads
+const username = prompt("Select user: Ishu or Billi");
+document.getElementById('chatUser').innerText = 'Chat - ' + username;
+
+const messagesDiv = document.getElementById('messages');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+const statusSpan = document.getElementById('status');
+const typingStatusDiv = document.getElementById('typingStatus');
+const clearBtn = document.getElementById('clearBtn');
+
+// 🔹 Firebase config embedded directly
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAyLfQR-k8L45imDdx0N-5pw8P43_pmJ8E",
+  authDomain: "youandme12345-d1d17.firebaseapp.com",
+  databaseURL: "https://youandme12345-d1d17-default-rtdb.firebaseio.com",
+  projectId: "youandme12345-d1d17",
+  storageBucket: "youandme12345-d1d17.firebasestorage.app",
+  messagingSenderId: "500541583420",
+  appId: "1:500541583420:web:ec35f7355884fb6e345339"
 };
 
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// Prompt for username on every page load
-let username = prompt("Enter your name:");
-while (!username) {
-  username = prompt("Name cannot be empty. Enter your name:");
-}
+const chatRef = db.ref('chat');
+const typingRef = db.ref('typing');
+const statusRef = db.ref('status/' + username);
 
-// References
-const chatBox = document.getElementById('chat-box');
-const messageInput = document.getElementById('messageInput');
-const sendBtn = document.getElementById('sendBtn');
-const clearBtn = document.getElementById('clearBtn');
-const statusEl = document.getElementById('status');
+// set online status
+statusRef.set({online: true, lastActive: Date.now()});
+statusRef.onDisconnect().set({online: false, lastActive: Date.now()});
 
-// Add online status for current user
-const userStatusRef = db.ref('/status/' + username);
-userStatusRef.onDisconnect().remove();
-userStatusRef.set({ online: true });
-
-// Show combined online/offline count
-db.ref('/status').on('value', snap => {
-  const statusObj = snap.val() || {};
-  const onlineUsers = Object.keys(statusObj).filter(u => statusObj[u].online);
-  statusEl.textContent = 'Online: ' + onlineUsers.join(', ');
+// listen for other user status
+db.ref('status').on('value', snap => {
+  let txt = '';
+  snap.forEach(child => {
+    if (child.key !== username) {
+      const val = child.val();
+      if (val.online) txt = child.key + ' is online';
+      else txt = child.key + ' last active ' + new Date(val.lastActive).toLocaleTimeString();
+    }
+  });
+  statusSpan.innerText = txt;
 });
 
-// Send message
+// send message
 sendBtn.addEventListener('click', sendMessage);
-messageInput.addEventListener('keyup', (e) => {
+messageInput.addEventListener('keydown', e => {
   if (e.key === 'Enter') sendMessage();
+  typingRef.set(username);
+  setTimeout(() => typingRef.remove(), 1500);
 });
 
 function sendMessage() {
-  const message = messageInput.value.trim();
-  if (message) {
-    const msgRef = db.ref('messages').push();
-    msgRef.set({
-      user: username,
-      text: message,
-      timestamp: Date.now()
-    });
-    messageInput.value = '';
-  }
+  const text = messageInput.value.trim();
+  if (!text) return;
+  const msgObj = {
+    user: username,
+    text: text,
+    time: Date.now(),
+    delivered: true,
+    read: false
+  };
+  chatRef.push(msgObj);
+  messageInput.value = '';
 }
 
-// Listen for messages
-db.ref('messages').on('child_added', snap => {
-  const msg = snap.val();
-  displayMessage(msg.user, msg.text);
+// clear chat
+clearBtn.addEventListener('click', () => {
+  chatRef.remove();
 });
 
-// Display messages
-function displayMessage(user, text) {
-  const div = document.createElement('div');
-  div.classList.add('message');
-  if (user === username) div.classList.add('my-message');
-  div.textContent = `${user}: ${text}`;
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-// Clear Chat
-clearBtn.addEventListener('click', () => {
-  if (confirm("Clear all chat messages?")) {
-    db.ref('messages').remove();
-    chatBox.innerHTML = '';
+// show typing
+typingRef.on('value', snap => {
+  const val = snap.val();
+  if (val && val !== username) {
+    typingStatusDiv.innerText = val + ' is typing...';
+  } else {
+    typingStatusDiv.innerText = '';
   }
+});
+
+// read messages + display
+chatRef.on('value', snap => {
+  messagesDiv.innerHTML = '';
+  snap.forEach(child => {
+    const msg = child.val();
+    const div = document.createElement('div');
+    div.classList.add('message');
+    if (msg.user === username) {
+      div.classList.add('me');
+    } else {
+      div.classList.add('other');
+    }
+    div.innerHTML = `<strong>${msg.user}:</strong> ${msg.text}
+      <span class="ticks">${msg.delivered ? '✓' : ''}${msg.read ? '✓' : ''}</span>`;
+    messagesDiv.appendChild(div);
+  });
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
 });
