@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WhatsApp Clone</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
@@ -32,6 +31,7 @@
       </div>
     </div>
     <button id="clearBtn" class="clear-btn">Clear Chat</button>
+    <button id="stickerBtn" class="sticker-btn">😺</button>
   </div>
 
   <div class="messages" id="messages"></div>
@@ -44,6 +44,13 @@
   <div class="input-container">
     <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off">
     <button id="sendBtn">Send</button>
+  </div>
+
+  <div id="stickerPanel" class="sticker-panel" style="display:none;">
+    <div class="sticker" data-sticker="https://cataas.com/cat/cute/says/hi">Hi</div>
+    <div class="sticker" data-sticker="https://cataas.com/cat/sleepy">Sleepy</div>
+    <div class="sticker" data-sticker="https://cataas.com/cat/funny">Funny</div>
+    <!-- Add more stickers here -->
   </div>
 </div>
 
