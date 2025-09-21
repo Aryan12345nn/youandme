@@ -13,6 +13,8 @@ const replyPreview = document.getElementById('replyPreview');
 const replyText = document.getElementById('replyText');
 const cancelReplyBtn = document.getElementById('cancelReply');
 const statusContainer = document.getElementById('statusContainer');
+const stickerBtn = document.getElementById('stickerBtn');
+const stickerPanel = document.getElementById('stickerPanel');
 
 const firebaseConfig = {
   apiKey: "AIzaSyAyLfQR-k8L45imDdx0N-5pw8P43_pmJ8E",
@@ -57,66 +59,6 @@ function sendMessage() {
   const text = messageInput.value.trim();
   if (!text) return;
   const msgObj = { user: username, text: text, time: Date.now() };
-  if (replyTo) msgObj.reply = replyTo.text;
-  chatRef.push(msgObj);
-  messageInput.value = '';
-  replyTo = null;
-  replyPreview.style.display = 'none';
-}
-
-// --- Clear chat ---
-clearBtn.addEventListener('click', () => {
-  if (confirm('Clear all chat?')) chatRef.remove();
-});
-
-// --- Typing indicator ---
-typingRef.on('value', snap => {
-  const val = snap.val();
-  typingHeader.innerText = val && val !== username ? val + ' is typing...' : '';
-});
-
-// --- Show messages ---
-chatRef.on('value', snap => {
-  messagesDiv.innerHTML = '';
-  snap.forEach(child => {
-    const msg = child.val();
-    const div = document.createElement('div');
-    div.classList.add('message');
-    div.classList.add(msg.user === username ? 'self' : 'other');
-
-    let html = `<strong>${msg.user}:</strong> ${msg.text}`;
-    if (msg.reply) html = `<div class="reply">Reply: ${msg.reply}</div>` + html;
-
-    div.innerHTML = html;
-
-    // Reply click
-    div.addEventListener('click', () => {
-      replyTo = { text: msg.text };
-      replyPreview.style.display = 'block';
-      replyText.innerText = msg.text;
-    });
-
-    messagesDiv.appendChild(div);
-  });
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
-});
-
-// --- Cancel reply ---
-cancelReplyBtn.addEventListener('click', () => {
-  replyTo = null;
-  replyPreview.style.display = 'none';
-});
-
-// --- Show both users' online status ---
-statusRef.on('value', snap => {
-  let statusTexts = [];
-  ['Ishu', 'Billi'].forEach(user => {
-    const val = snap.child(user).val();
-    if (val) {
-      statusTexts.push(`${user} - ${val.online ? 'online' : 'offline'}`);
-    } else {
-      statusTexts.push(`${user} - offline`);
-    }
-  });
-  statusContainer.innerText = statusTexts.join(' | ');
-});
+  if (replyTo) msgObj.reply = reply
+::contentReference[oaicite:0]{index=0}
+ 
