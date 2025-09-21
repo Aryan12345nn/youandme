@@ -1,5 +1,7 @@
 // Prompt for name every time page loads
-const username = prompt("Select user: Ishu or Billi");
+let username = prompt("Select user: Ishu or Billi");
+if (!username) username = 'Ishu';
+username = username.toLowerCase() === 'billi' ? 'Billi' : 'Ishu';
 document.getElementById('chatUser').innerText = 'Chat - ' + username;
 
 const messagesDiv = document.getElementById('messages');
@@ -9,7 +11,7 @@ const statusSpan = document.getElementById('status');
 const typingStatusDiv = document.getElementById('typingStatus');
 const clearBtn = document.getElementById('clearBtn');
 
-// 🔹 Firebase config embedded directly
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAyLfQR-k8L45imDdx0N-5pw8P43_pmJ8E",
   authDomain: "youandme12345-d1d17.firebaseapp.com",
@@ -19,8 +21,6 @@ const firebaseConfig = {
   messagingSenderId: "500541583420",
   appId: "1:500541583420:web:ec35f7355884fb6e345339"
 };
-
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
@@ -28,51 +28,49 @@ const chatRef = db.ref('chat');
 const typingRef = db.ref('typing');
 const statusRef = db.ref('status/' + username);
 
-// set online status
+// Set online status
 statusRef.set({online: true, lastActive: Date.now()});
 statusRef.onDisconnect().set({online: false, lastActive: Date.now()});
 
-// listen for other user status
+// Listen for other user status
 db.ref('status').on('value', snap => {
-  let txt = '';
+  let statusText = '';
   snap.forEach(child => {
-    if (child.key !== username) {
-      const val = child.val();
-      if (val.online) txt = child.key + ' is online';
-      else txt = child.key + ' last active ' + new Date(val.lastActive).toLocaleTimeString();
+    const key = child.key;
+    const val = child.val();
+    if (key === username) {
+      statusText += `${key} (You) - ${val.online ? 'online' : 'offline'} | `;
+    } else {
+      statusText += `${key} - ${val.online ? 'online' : 'offline'} | `;
     }
   });
-  statusSpan.innerText = txt;
+  statusSpan.innerText = statusText.slice(0, -3); // remove last " | "
 });
 
-// send message
-sendBtn.addEventListener('click', sendMessage);
-messageInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter') sendMessage();
-  typingRef.set(username);
-  setTimeout(() => typingRef.remove(), 1500);
-});
-
+// Send message
 function sendMessage() {
   const text = messageInput.value.trim();
   if (!text) return;
+
   const msgObj = {
     user: username,
     text: text,
-    time: Date.now(),
-    delivered: true,
-    read: false
+    time: Date.now()
   };
+
   chatRef.push(msgObj);
   messageInput.value = '';
 }
 
-// clear chat
-clearBtn.addEventListener('click', () => {
-  chatRef.remove();
+// Event listeners
+sendBtn.addEventListener('click', sendMessage);
+messageInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendMessage();
+  typingRef.set(username);
+  setTimeout(() => typingRef.remove(), 1000);
 });
 
-// show typing
+// Show typing status
 typingRef.on('value', snap => {
   const val = snap.val();
   if (val && val !== username) {
@@ -82,21 +80,23 @@ typingRef.on('value', snap => {
   }
 });
 
-// read messages + display
+// Read messages + display
 chatRef.on('value', snap => {
   messagesDiv.innerHTML = '';
   snap.forEach(child => {
     const msg = child.val();
     const div = document.createElement('div');
     div.classList.add('message');
-    if (msg.user === username) {
-      div.classList.add('me');
-    } else {
-      div.classList.add('other');
-    }
-    div.innerHTML = `<strong>${msg.user}:</strong> ${msg.text}
-      <span class="ticks">${msg.delivered ? '✓' : ''}${msg.read ? '✓' : ''}</span>`;
+    div.classList.add(msg.user === username ? 'me' : 'other');
+    div.innerHTML = `<strong>${msg.user}:</strong> ${msg.text}`;
     messagesDiv.appendChild(div);
   });
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
+});
+
+// Clear chat
+clearBtn.addEventListener('click', () => {
+  if (confirm('Are you sure you want to clear the chat?')) {
+    chatRef.remove();
+  }
 });
