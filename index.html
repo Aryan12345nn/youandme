@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ishu & Billi Chat</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="header">
+    <div class="status">
+      <span id="ishuStatus">Ishu: offline</span> | 
+      <span id="billiStatus">Billi: offline</span>
+    </div>
+    <button id="clearChatBtn" class="clear-btn">Clear Chat</button>
+  </div>
+
+  <div id="chatBox" class="chat-box"></div>
+
+  <div class="input-box">
+    <input id="messageInput" type="text" placeholder="Type a message…">
+    <button id="stickerBtn">😸</button>
+    <button id="sendBtn">Send</button>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>
