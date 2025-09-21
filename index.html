@@ -1,63 +1,241 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Ishu & Billi — Chat</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhatsApp-like Chat</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #111b21;
+  color: #fff;
+}
+.header {
+  position: fixed;
+  top: 0; left: 0; width: 100%;
+  background: #202c33;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+.statuses {font-size: 12px; color: #aaa;}
+.chat-container {
+  margin-top: 70px;
+  padding: 10px;
+  padding-bottom: 90px; /* space for input */
+  overflow-y: auto;
+  height: calc(100vh - 140px);
+}
+.message {
+  max-width: 70%;
+  padding: 8px 12px;
+  border-radius: 10px;
+  margin: 5px 0;
+  clear: both;
+}
+.message.me {
+  background: #005c4b;
+  float: right;
+}
+.message.them {
+  background: #202c33;
+  float: left;
+}
+.input-container {
+  position: fixed;
+  bottom: 0; left: 0; width: 100%;
+  background: #202c33;
+  display: flex;
+  align-items: center;
+  padding: 5px;
+}
+#messageInput {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 20px;
+  outline: none;
+  margin-right: 5px;
+}
+#sendBtn, #stickerBtn {
+  padding: 8px 12px;
+  margin-left: 4px;
+  background: #25D366;
+  border: none;
+  border-radius: 20px;
+  color: #fff;
+  cursor: pointer;
+}
+.overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.overlay-content {
+  background: #202c33;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+.user-btn {
+  display: block;
+  width: 100px;
+  margin: 10px auto;
+  padding: 10px;
+  color: white;
+  background: #25D366;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+</style>
 </head>
 <body>
-  <div class="wrapper">
-    <!-- Header (sticky) -->
-    <div class="header">
-      <div class="status-line">
-        <span id="ishuStatus">Ishu (offline)</span>
-        <span id="sep"> | </span>
-        <span id="billiStatus">Billi (offline)</span>
-      </div>
-      <div class="header-actions">
-        <button id="clearChatBtn" class="red">Clear Chat</button>
-      </div>
-    </div>
 
-    <!-- Main chat area -->
-    <div class="container">
-      <div id="chatBox" class="chat-box"></div>
-
-      <!-- typing bubble will be injected inside chatBox -->
-      <!-- input area is absolutely positioned inside container -->
-      <div class="input-box" id="inputBox">
-        <input id="messageInput" placeholder="Type a message…" autocomplete="off" />
-        <button id="stickerBtnFloat" title="Stickers">😺</button>
-        <button id="sendBtn">Send</button>
-      </div>
-
-      <!-- sticker strip -->
-      <div id="stickerPopup" class="sticker-popup">
-        <!-- sample cat stickers (Cataas) -->
-        <img class="sticker" src="https://cataas.com/cat/says/Hi">
-        <img class="sticker" src="https://cataas.com/cat/says/Meow">
-        <img class="sticker" src="https://cataas.com/cat/says/Fun">
-        <img class="sticker" src="https://cataas.com/cat/says/Lol">
-        <img class="sticker" src="https://cataas.com/cat/says/Hey">
-        <img class="sticker" src="https://cataas.com/cat/says/Cute">
-        <img class="sticker" src="https://cataas.com/cat/says/Wow">
-        <img class="sticker" src="https://cataas.com/cat/says/Yay">
-        <img class="sticker" src="https://cataas.com/cat/says/Nice">
-        <img class="sticker" src="https://cataas.com/cat/says/Good">
-      </div>
+<div class="header">
+  <div>
+    <div><strong>Chat</strong></div>
+    <div class="statuses">
+      Ishu: <span id="ishuStatus">offline</span> |
+      Billi: <span id="billiStatus">offline</span>
     </div>
   </div>
+  <button id="clearChatBtn">Clear Chat</button>
+</div>
 
-  <!-- user selection popup (first load) -->
-  <div id="userPopup" class="user-popup">
+<div class="chat-container" id="chatContainer"></div>
+
+<div class="input-container">
+  <button id="stickerBtn">😺</button>
+  <input id="messageInput" type="text" placeholder="Type a message…">
+  <button id="sendBtn">Send</button>
+</div>
+
+<!-- Popup overlay every load -->
+<div id="userSelectOverlay" class="overlay">
+  <div class="overlay-content">
     <h2>Select User</h2>
-    <div class="user-choices">
-      <button onclick="selectUser('Ishu')">Ishu</button>
-      <button onclick="selectUser('Billi')">Billi</button>
-    </div>
+    <button class="user-btn" onclick="chooseUser('ishu')">Ishu</button>
+    <button class="user-btn" onclick="chooseUser('billi')">Billi</button>
   </div>
+</div>
 
-  <script type="module" src="app.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getDatabase, ref, push, onValue, set, serverTimestamp, onDisconnect } 
+  from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAyLfQR-k8L45imDdx0N-5pw8P43_pmJ8E",
+  authDomain: "youandme12345-d1d17.firebaseapp.com",
+  databaseURL: "https://youandme12345-d1d17-default-rtdb.firebaseio.com", 
+  projectId: "youandme12345-d1d17",
+  storageBucket: "youandme12345-d1d17.firebasestorage.app",
+  messagingSenderId: "500541583420",
+  appId: "1:500541583420:web:ec35f7355884fb6e345339"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let username = null;
+
+const overlay = document.getElementById('userSelectOverlay');
+overlay.style.display = 'flex';
+
+window.chooseUser = (user) => {
+  username = user;
+  overlay.style.display = 'none';
+  setupStatus(user);
+  loadMessages();
+};
+
+function setupStatus(user) {
+  const userStatusRef = ref(db, '/status/' + user);
+  const isOnlineForDatabase = {
+    state: 'online',
+    last_changed: serverTimestamp(),
+  };
+  const isOfflineForDatabase = {
+    state: 'offline',
+    last_changed: serverTimestamp(),
+  };
+  const connectedRef = ref(db, '.info/connected');
+  onValue(connectedRef, (snap) => {
+    if (snap.val() === false) return;
+    onDisconnect(userStatusRef).set(isOfflineForDatabase).then(() => {
+      set(userStatusRef, isOnlineForDatabase);
+    });
+  });
+
+  // listen for both statuses
+  onValue(ref(db, '/status/ishu'), (snap) => {
+    const s = snap.val();
+    document.getElementById('ishuStatus').textContent =
+      s?.state === 'online' ? 'online' : 
+      'last ' + new Date(s?.last_changed || Date.now()).toLocaleTimeString();
+  });
+  onValue(ref(db, '/status/billi'), (snap) => {
+    const s = snap.val();
+    document.getElementById('billiStatus').textContent =
+      s?.state === 'online' ? 'online' : 
+      'last ' + new Date(s?.last_changed || Date.now()).toLocaleTimeString();
+  });
+}
+
+const chatContainer = document.getElementById('chatContainer');
+const msgInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+const stickerBtn = document.getElementById('stickerBtn');
+
+function loadMessages() {
+  onValue(ref(db, 'messages'), (snap) => {
+    chatContainer.innerHTML = '';
+    snap.forEach(child => {
+      const m = child.val();
+      const div = document.createElement('div');
+      div.className = 'message ' + (m.user === username ? 'me' : 'them');
+      div.textContent = m.text;
+      chatContainer.appendChild(div);
+    });
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  });
+}
+
+sendBtn.onclick = () => {
+  const text = msgInput.value.trim();
+  if (!text) return;
+  push(ref(db, 'messages'), {
+    user: username,
+    text: text,
+    timestamp: serverTimestamp()
+  });
+  msgInput.value = '';
+};
+
+stickerBtn.onclick = () => {
+  // send a cat sticker as message text (just as emoji or link)
+  push(ref(db, 'messages'), {
+    user: username,
+    text: '😺 [cat sticker]',
+    timestamp: serverTimestamp()
+  });
+};
+
+document.getElementById('clearChatBtn').addEventListener('click', () => {
+  if (confirm('Clear all chat messages?')) {
+    set(ref(db, 'messages'), {});
+  }
+});
+</script>
+
 </body>
 </html>
