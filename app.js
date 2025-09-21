@@ -41,10 +41,9 @@ const stickerUrls = [];
 const tags = ['cute','funny','sleepy','angry','silly','love','hello','grumpy','happy'];
 for(let i=0;i<tags.length;i++){
   for(let j=0;j<6;j++){
-    stickerUrls.push(`https://cataas.com/cat/${tags[i]}?width=100&height=100&random=${j}`);
+    stickerUrls.push(`https://cataas.com/cat/${tags[i]}?width=80&height=80&random=${j}`);
   }
 }
-stickerPanel.style.display = 'none';
 stickerUrls.forEach(url=>{
   const img = document.createElement('img');
   img.src = url;
@@ -69,9 +68,9 @@ document.querySelectorAll('.user-btn').forEach(btn=>{
 // --- Send message ---
 sendBtn.addEventListener('click', sendMessage);
 messageInput.addEventListener('input', ()=>{
-  typingRef.set(username); // update typing
+  typingRef.set(username);
   clearTimeout(typingTimeout);
-  typingTimeout = setTimeout(()=> typingRef.remove(), 1500);
+  typingTimeout = setTimeout(()=> typingRef.remove(), 2000);
 });
 messageInput.addEventListener('keydown', e=>{
   if(e.key==='Enter') sendMessage();
@@ -135,7 +134,6 @@ chatRef.on('value', snap=>{
       html = `<strong>${msg.user}:</strong> ${msg.text}`;
       if(msg.reply) html = `<div class="reply">Reply: ${msg.reply}</div>`+html;
     }
-
     div.innerHTML = html;
 
     div.addEventListener('click', ()=>{
