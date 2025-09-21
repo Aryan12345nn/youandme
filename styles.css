@@ -1,93 +1,58 @@
-body {
-  font-family: Arial, sans-serif;
-  background: #f1f1f1;
-  margin: 0;
+* { box-sizing: border-box; margin:0; padding:0; font-family: 'Segoe UI', sans-serif; }
+
+body, html { height: 100%; background: #121212; color: #fff; }
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  top:0; left:0; width:100%; height:100%;
+  background: rgba(0,50,0,0.95);
+  display:flex; justify-content:center; align-items:center;
+  z-index:9999;
 }
 
-.chat-container {
-  max-width: 500px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background: white;
-  border: 1px solid #ccc;
+.overlay-content {
+  text-align:center; background:#023c00; padding:40px; border-radius:15px;
 }
 
-.chat-header {
-  position: sticky;
-  top: 0;
-  background: #007bff;
-  color: white;
-  padding: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 10;
-}
+.overlay-content h2 { font-size:28px; margin-bottom:20px; color:#fff; }
 
-.status {
-  font-size: 12px;
-  margin-left: 10px;
+.user-btn {
+  display:block; width:200px; padding:15px; margin:10px auto; font-size:18px;
+  border-radius:25px; border:none; background:#025e00; color:white; font-weight:bold; cursor:pointer;
+  transition: background 0.3s;
 }
+.user-btn:hover { background:#028800; }
 
-.chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-}
+/* Chat container */
+.chat-container { display:flex; flex-direction:column; max-width:600px; margin:0 auto; height:100vh; background:#1e1e1e; border:1px solid #333; }
 
-.message {
-  margin: 5px 0;
-  padding: 8px 12px;
-  border-radius: 15px;
-  max-width: 70%;
-  position: relative;
-}
+/* Header */
+.header { display:flex; justify-content:space-between; align-items:center; padding:10px 15px; background:#202c33; position:relative; }
+.header-left { display:flex; align-items:center; }
+.avatar { width:40px; height:40px; background:#25d366; border-radius:50%; margin-right:10px; }
+.header-info h2 { font-size:16px; }
+.typing-header { font-style:italic; color:#a0cfa0; font-size:12px; }
+.clear-btn { background:#25d366; border:none; padding:6px 12px; border-radius:20px; cursor:pointer; color:white; font-weight:bold; }
 
-.message.me {
-  background: #d1f7c4;
-  margin-left: auto;
-  text-align: right;
-}
+/* Messages */
+.messages { flex:1; padding:15px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; background:#121212; }
+.message { padding:10px 15px; border-radius:20px; max-width:70%; word-wrap:break-word; font-size:14px; line-height:1.4; position:relative; cursor:pointer; }
+.message.self { align-self:flex-end; background:#056162; color:#fff; }
+.message.other { align-self:flex-start; background:#262d31; }
 
-.message.other {
-  background: #eee;
-  margin-right: auto;
-  text-align: left;
-}
+/* Reply preview */
+.reply-preview { display:none; padding:5px 10px; background:#333; border-left:3px solid #25d366; margin:0 15px; font-size:12px; color:#fff; }
+.reply-preview span { font-weight:bold; }
+.reply-preview button { border:none; background:transparent; cursor:pointer; float:right; font-weight:bold; color:#ff6666; }
 
-.ticks {
-  font-size: 10px;
-  color: gray;
-  display: block;
-  margin-top: 2px;
-}
+/* Input container */
+.input-container { display:flex; padding:10px 15px; border-top:1px solid #333; background:#1e1e1e; }
+.input-container input { flex:1; padding:10px 15px; border-radius:20px; border:1px solid #444; outline:none; font-size:14px; background:#121212; color:#fff; }
+.input-container button { margin-left:10px; padding:10px 20px; border-radius:20px; border:none; background:#25d366; color:white; cursor:pointer; }
 
-.typing-status {
-  font-size: 12px;
-  color: gray;
-  padding: 0 10px 5px;
-}
+/* Scrollbar */
+.messages::-webkit-scrollbar { width:6px; }
+.messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius:3px; }
 
-.chat-input {
-  display: flex;
-  padding: 10px;
-  background: #fafafa;
-}
-
-.chat-input input {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 15px;
-  margin-right: 5px;
-}
-.chat-input button {
-  padding: 10px 15px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 15px;
-  cursor: pointer;
-}
+#statusContainer { font-size:12px; margin-top:3px; }
