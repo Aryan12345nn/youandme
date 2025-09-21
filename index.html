@@ -1,32 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Firebase Chat</title>
+  <title>Chat App</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
   <div class="chat-container">
     <div class="chat-header">
-      <div>
-        <h2>Chat</h2>
-        <p id="status">Offline</p>
-      </div>
+      <h3 id="chatUser">Chat</h3>
+      <span id="status" class="status"></span>
       <button id="clearBtn">Clear Chat</button>
     </div>
-
-    <div id="chat-box" class="chat-box"></div>
-
+    <div id="messages" class="chat-messages"></div>
+    <div id="typingStatus" class="typing-status"></div>
     <div class="chat-input">
-      <input type="text" id="messageInput" placeholder="Type a message..." />
+      <input type="text" id="messageInput" placeholder="Type your message...">
       <button id="sendBtn">Send</button>
     </div>
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>
