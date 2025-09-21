@@ -1,29 +1,63 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ishu & Billi Chat</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ishu & Billi — Chat</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="header">
-    <div class="status">
-      <span id="ishuStatus">Ishu: offline</span> | 
-      <span id="billiStatus">Billi: offline</span>
+  <div class="wrapper">
+    <!-- Header (sticky) -->
+    <div class="header">
+      <div class="status-line">
+        <span id="ishuStatus">Ishu (offline)</span>
+        <span id="sep"> | </span>
+        <span id="billiStatus">Billi (offline)</span>
+      </div>
+      <div class="header-actions">
+        <button id="clearChatBtn" class="red">Clear Chat</button>
+      </div>
     </div>
-    <button id="clearChatBtn" class="clear-btn">Clear Chat</button>
+
+    <!-- Main chat area -->
+    <div class="container">
+      <div id="chatBox" class="chat-box"></div>
+
+      <!-- typing bubble will be injected inside chatBox -->
+      <!-- input area is absolutely positioned inside container -->
+      <div class="input-box" id="inputBox">
+        <input id="messageInput" placeholder="Type a message…" autocomplete="off" />
+        <button id="stickerBtnFloat" title="Stickers">😺</button>
+        <button id="sendBtn">Send</button>
+      </div>
+
+      <!-- sticker strip -->
+      <div id="stickerPopup" class="sticker-popup">
+        <!-- sample cat stickers (Cataas) -->
+        <img class="sticker" src="https://cataas.com/cat/says/Hi">
+        <img class="sticker" src="https://cataas.com/cat/says/Meow">
+        <img class="sticker" src="https://cataas.com/cat/says/Fun">
+        <img class="sticker" src="https://cataas.com/cat/says/Lol">
+        <img class="sticker" src="https://cataas.com/cat/says/Hey">
+        <img class="sticker" src="https://cataas.com/cat/says/Cute">
+        <img class="sticker" src="https://cataas.com/cat/says/Wow">
+        <img class="sticker" src="https://cataas.com/cat/says/Yay">
+        <img class="sticker" src="https://cataas.com/cat/says/Nice">
+        <img class="sticker" src="https://cataas.com/cat/says/Good">
+      </div>
+    </div>
   </div>
 
-  <div id="chatBox" class="chat-box"></div>
-
-  <div class="input-box">
-    <input id="messageInput" type="text" placeholder="Type a message…">
-    <button id="stickerBtn">😸</button>
-    <button id="sendBtn">Send</button>
+  <!-- user selection popup (first load) -->
+  <div id="userPopup" class="user-popup">
+    <h2>Select User</h2>
+    <div class="user-choices">
+      <button onclick="selectUser('Ishu')">Ishu</button>
+      <button onclick="selectUser('Billi')">Billi</button>
+    </div>
   </div>
 
-  <!-- Firebase SDK -->
   <script type="module" src="app.js"></script>
 </body>
 </html>
