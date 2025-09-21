@@ -1,6 +1,9 @@
 let username = '';
 let replyTo = null;
+let typingTimeout;
+let typingInterval;
 
+// DOM elements
 const userSelection = document.getElementById('userSelection');
 const chatContainer = document.getElementById('chatContainer');
 const chatUserHeader = document.getElementById('chatUser');
@@ -17,6 +20,7 @@ const statusContainer = document.getElementById('statusContainer');
 const stickerBtn = document.getElementById('stickerBtn');
 const stickerPanel = document.getElementById('stickerPanel');
 
+// Firebase setup
 const firebaseConfig = {
   apiKey: "AIzaSyAyLfQR-k8L45imDdx0N-5pw8P43_pmJ8E",
   authDomain: "youandme12345-d1d17.firebaseapp.com",
@@ -32,7 +36,7 @@ const chatRef = db.ref('chat');
 const typingRef = db.ref('typing');
 const statusRef = db.ref('status');
 
-// Sticker URLs
+// --- Stickers ---
 const stickerUrls = [];
 const tags = ['cute','funny','sleepy','angry','silly','love','hello','grumpy','happy'];
 for(let i=0;i<tags.length;i++){
@@ -40,8 +44,7 @@ for(let i=0;i<tags.length;i++){
     stickerUrls.push(`https://cataas.com/cat/${tags[i]}?width=100&height=100&random=${j}`);
   }
 }
-
-// populate sticker panel
+stickerPanel.style.display = 'none';
 stickerUrls.forEach(url=>{
   const img = document.createElement('img');
   img.src = url;
@@ -49,7 +52,7 @@ stickerUrls.forEach(url=>{
   stickerPanel.appendChild(img);
 });
 
-// User selection
+// --- User selection ---
 document.querySelectorAll('.user-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     username = btn.dataset.user;
@@ -57,19 +60,21 @@ document.querySelectorAll('.user-btn').forEach(btn=>{
     userSelection.style.display='none';
     chatContainer.style.display='flex';
 
-    // Set online
     const myStatusRef = statusRef.child(username);
     myStatusRef.set({online:true,lastActive:Date.now()});
     myStatusRef.onDisconnect().set({online:false,lastActive:Date.now()});
   });
 });
 
-// Send message
+// --- Send message ---
 sendBtn.addEventListener('click', sendMessage);
+messageInput.addEventListener('input', ()=>{
+  typingRef.set(username); // update typing
+  clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(()=> typingRef.remove(), 1500);
+});
 messageInput.addEventListener('keydown', e=>{
   if(e.key==='Enter') sendMessage();
-  typingRef.set(username);
-  setTimeout(()=> typingRef.remove(),1000);
   setTimeout(()=> messagesDiv.scrollTop = messagesDiv.scrollHeight,200);
 });
 
@@ -84,24 +89,37 @@ function sendMessage(){
   replyPreview.style.display='none';
 }
 
-// Send sticker
+// --- Send sticker ---
 function sendSticker(url){
   const msgObj = {user:username,sticker:url,time:Date.now()};
   chatRef.push(msgObj);
   stickerPanel.style.display='none';
 }
 
-// Clear chat
+// --- Clear chat ---
 clearBtn.addEventListener('click', ()=>{if(confirm('Clear all chat?')) chatRef.remove();});
 
-// Typing indicator
+// --- Typing indicator with animated dots ---
 typingRef.on('value', snap=>{
   const val = snap.val();
-  typingHeader.innerText = val && val!==username ? val+' is typing...' : '';
-  chatTyping.innerText = val && val!==username ? val+' is typing...' : '';
+  if(val && val!==username){
+    let dotCount = 0;
+    clearInterval(typingInterval);
+    typingInterval = setInterval(()=>{
+      dotCount = (dotCount + 1) % 4;
+      const dots = '.'.repeat(dotCount);
+      const text = `${val} is typing${dots}`;
+      typingHeader.innerText = text;
+      chatTyping.innerText = text;
+    }, 500);
+  } else {
+    clearInterval(typingInterval);
+    typingHeader.innerText = '';
+    chatTyping.innerText = '';
+  }
 });
 
-// Show messages
+// --- Show messages ---
 chatRef.on('value', snap=>{
   messagesDiv.innerHTML='';
   snap.forEach(child=>{
@@ -133,10 +151,10 @@ chatRef.on('value', snap=>{
   messagesDiv.scrollTop=messagesDiv.scrollHeight;
 });
 
-// Cancel reply
+// --- Cancel reply ---
 cancelReplyBtn.addEventListener('click', ()=>{replyTo=null; replyPreview.style.display='none';});
 
-// Show online status
+// --- Online status ---
 statusRef.on('value', snap=>{
   let statusTexts = [];
   ['Ishu','Billi'].forEach(user=>{
@@ -147,7 +165,7 @@ statusRef.on('value', snap=>{
   statusContainer.innerText = statusTexts.join(' | ');
 });
 
-// Sticker panel toggle
+// --- Sticker panel toggle ---
 stickerBtn.addEventListener('click', ()=>{
   stickerPanel.style.display = stickerPanel.style.display==='flex'?'none':'flex';
   if(stickerPanel.style.display==='flex') stickerPanel.scrollLeft = 0;
