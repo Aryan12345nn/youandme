@@ -32,11 +32,11 @@ const chatRef = db.ref('chat');
 const typingRef = db.ref('typing');
 const statusRef = db.ref('status');
 
-// --- Sticker URLs (small fast-loading thumbnails) ---
+// Sticker URLs
 const stickerUrls = [];
 const tags = ['cute','funny','sleepy','angry','silly','love','hello','grumpy','happy'];
 for(let i=0;i<tags.length;i++){
-  for(let j=0;j<6;j++){ // 6 per tag = 48 stickers
+  for(let j=0;j<6;j++){
     stickerUrls.push(`https://cataas.com/cat/${tags[i]}?width=100&height=100&random=${j}`);
   }
 }
@@ -49,7 +49,7 @@ stickerUrls.forEach(url=>{
   stickerPanel.appendChild(img);
 });
 
-// --- User selection ---
+// User selection
 document.querySelectorAll('.user-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     username = btn.dataset.user;
@@ -64,13 +64,12 @@ document.querySelectorAll('.user-btn').forEach(btn=>{
   });
 });
 
-// --- Send message ---
+// Send message
 sendBtn.addEventListener('click', sendMessage);
 messageInput.addEventListener('keydown', e=>{
   if(e.key==='Enter') sendMessage();
   typingRef.set(username);
   setTimeout(()=> typingRef.remove(),1000);
-  // scroll input into view on mobile
   setTimeout(()=> messagesDiv.scrollTop = messagesDiv.scrollHeight,200);
 });
 
@@ -85,24 +84,24 @@ function sendMessage(){
   replyPreview.style.display='none';
 }
 
-// --- Send sticker ---
+// Send sticker
 function sendSticker(url){
   const msgObj = {user:username,sticker:url,time:Date.now()};
   chatRef.push(msgObj);
   stickerPanel.style.display='none';
 }
 
-// --- Clear chat ---
+// Clear chat
 clearBtn.addEventListener('click', ()=>{if(confirm('Clear all chat?')) chatRef.remove();});
 
-// --- Typing indicator ---
+// Typing indicator
 typingRef.on('value', snap=>{
   const val = snap.val();
   typingHeader.innerText = val && val!==username ? val+' is typing...' : '';
   chatTyping.innerText = val && val!==username ? val+' is typing...' : '';
 });
 
-// --- Show messages ---
+// Show messages
 chatRef.on('value', snap=>{
   messagesDiv.innerHTML='';
   snap.forEach(child=>{
@@ -134,10 +133,10 @@ chatRef.on('value', snap=>{
   messagesDiv.scrollTop=messagesDiv.scrollHeight;
 });
 
-// --- Cancel reply ---
+// Cancel reply
 cancelReplyBtn.addEventListener('click', ()=>{replyTo=null; replyPreview.style.display='none';});
 
-// --- Show both users' online status ---
+// Show online status
 statusRef.on('value', snap=>{
   let statusTexts = [];
   ['Ishu','Billi'].forEach(user=>{
@@ -148,7 +147,8 @@ statusRef.on('value', snap=>{
   statusContainer.innerText = statusTexts.join(' | ');
 });
 
-// --- Sticker panel toggle ---
+// Sticker panel toggle
 stickerBtn.addEventListener('click', ()=>{
   stickerPanel.style.display = stickerPanel.style.display==='flex'?'none':'flex';
+  if(stickerPanel.style.display==='flex') stickerPanel.scrollLeft = 0;
 });
