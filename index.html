@@ -3,26 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat App</title>
+  <title>WhatsApp Clone</title>
   <link rel="stylesheet" href="styles.css">
   <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="chat-header">
-      <h3 id="chatUser">Chat</h3>
-      <span id="status" class="status"></span>
-      <button id="clearBtn">Clear Chat</button>
-    </div>
-    <div id="messages" class="chat-messages"></div>
-    <div id="typingStatus" class="typing-status"></div>
-    <div class="chat-input">
-      <input type="text" id="messageInput" placeholder="Type your message...">
-      <button id="sendBtn">Send</button>
-    </div>
+
+<!-- User selection overlay -->
+<div id="userSelection" class="overlay">
+  <div class="overlay-content">
+    <h2>Select User</h2>
+    <button class="user-btn" data-user="Ishu">Ishu</button>
+    <button class="user-btn" data-user="Billi">Billi</button>
   </div>
-  <script src="script.js"></script>
+</div>
+
+<!-- Chat container -->
+<div class="chat-container" id="chatContainer" style="display:none;">
+  <div class="header">
+    <div class="header-left">
+      <div class="avatar"></div>
+      <div class="header-info">
+        <h2 id="chatUser">Chat</h2>
+        <div id="statusContainer"></div>
+        <span id="typingHeader" class="typing-header"></span>
+      </div>
+    </div>
+    <button id="clearBtn" class="clear-btn">Clear Chat</button>
+  </div>
+
+  <div class="messages" id="messages"></div>
+
+  <div class="reply-preview" id="replyPreview">
+    Replying to: <span id="replyText"></span>
+    <button id="cancelReply">X</button>
+  </div>
+
+  <div class="input-container">
+    <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off">
+    <button id="sendBtn">Send</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
