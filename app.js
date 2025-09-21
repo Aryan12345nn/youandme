@@ -9,7 +9,7 @@ const messageInput = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
 const clearBtn = document.getElementById('clearBtn');
 const typingHeader = document.getElementById('typingHeader');
-const typingChat = document.getElementById('typingChat');
+const chatTyping = document.getElementById('chatTyping');
 const replyPreview = document.getElementById('replyPreview');
 const replyText = document.getElementById('replyText');
 const cancelReplyBtn = document.getElementById('cancelReply');
@@ -26,34 +26,26 @@ const firebaseConfig = {
   messagingSenderId: "500541583420",
   appId: "1:500541583420:web:ec35f7355884fb6e345339"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const chatRef = db.ref('chat');
 const typingRef = db.ref('typing');
 const statusRef = db.ref('status');
 
-// --- Cat stickers (example URLs, ~20 here, can expand to 50+) ---
-const stickerUrls = [
-  'https://cataas.com/cat/cute/says/hi',
-  'https://cataas.com/cat/cute/says/hello',
-  'https://cataas.com/cat/sleepy',
-  'https://cataas.com/cat/funny',
-  'https://cataas.com/cat/cute/says/hey',
-  'https://cataas.com/cat/cute/says/bye',
-  'https://cataas.com/cat/angry',
-  'https://cataas.com/cat/silly',
-  'https://cataas.com/cat/cute/says/yes',
-  'https://cataas.com/cat/cute/says/no'
-];
+// --- Sticker URLs (small fast-loading thumbnails) ---
+const stickerUrls = [];
+const tags = ['cute','funny','sleepy','angry','silly','love','hello','grumpy','happy'];
+for(let i=0;i<tags.length;i++){
+  for(let j=0;j<6;j++){ // 6 per tag = 48 stickers
+    stickerUrls.push(`https://cataas.com/cat/${tags[i]}?width=100&height=100&random=${j}`);
+  }
+}
+
+// populate sticker panel
 stickerUrls.forEach(url=>{
   const img = document.createElement('img');
   img.src = url;
-  img.classList.add('sticker');
-  img.addEventListener('click', ()=>{
-    chatRef.push({user:username, sticker:url, time:Date.now()});
-    stickerPanel.style.display='none';
-  });
+  img.addEventListener('click', ()=> sendSticker(url));
   stickerPanel.appendChild(img);
 });
 
@@ -62,8 +54,10 @@ document.querySelectorAll('.user-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     username = btn.dataset.user;
     chatUserHeader.innerText = 'Chat';
-    userSelection.style.display = 'none';
-    chatContainer.style.display = 'flex';
+    userSelection.style.display='none';
+    chatContainer.style.display='flex';
+
+    // Set online
     const myStatusRef = statusRef.child(username);
     myStatusRef.set({online:true,lastActive:Date.now()});
     myStatusRef.onDisconnect().set({online:false,lastActive:Date.now()});
@@ -75,7 +69,9 @@ sendBtn.addEventListener('click', sendMessage);
 messageInput.addEventListener('keydown', e=>{
   if(e.key==='Enter') sendMessage();
   typingRef.set(username);
-  setTimeout(()=> typingRef.remove(), 1000);
+  setTimeout(()=> typingRef.remove(),1000);
+  // scroll input into view on mobile
+  setTimeout(()=> messagesDiv.scrollTop = messagesDiv.scrollHeight,200);
 });
 
 function sendMessage(){
@@ -89,14 +85,21 @@ function sendMessage(){
   replyPreview.style.display='none';
 }
 
+// --- Send sticker ---
+function sendSticker(url){
+  const msgObj = {user:username,sticker:url,time:Date.now()};
+  chatRef.push(msgObj);
+  stickerPanel.style.display='none';
+}
+
 // --- Clear chat ---
-clearBtn.addEventListener('click', ()=>{ if(confirm('Clear all chat?')) chatRef.remove(); });
+clearBtn.addEventListener('click', ()=>{if(confirm('Clear all chat?')) chatRef.remove();});
 
 // --- Typing indicator ---
 typingRef.on('value', snap=>{
   const val = snap.val();
   typingHeader.innerText = val && val!==username ? val+' is typing...' : '';
-  typingChat.innerText = val && val!==username ? val+' is typing...' : '';
+  chatTyping.innerText = val && val!==username ? val+' is typing...' : '';
 });
 
 // --- Show messages ---
@@ -104,16 +107,19 @@ chatRef.on('value', snap=>{
   messagesDiv.innerHTML='';
   snap.forEach(child=>{
     const msg = child.val();
-    const div=document.createElement('div');
+    const div = document.createElement('div');
     div.classList.add('message');
     div.classList.add(msg.user===username?'self':'other');
+
+    let html = '';
     if(msg.sticker){
-      div.innerHTML=`<img src="${msg.sticker}" style="width:120px;border-radius:15px;">`;
+      html = `<strong>${msg.user}:</strong><br><img src="${msg.sticker}" class="sticker"/>`;
     } else {
-      let html = `<strong>${msg.user}:</strong> ${msg.text}`;
-      if(msg.reply) html=`<div class="reply">Reply: ${msg.reply}</div>`+html;
-      div.innerHTML=html;
+      html = `<strong>${msg.user}:</strong> ${msg.text}`;
+      if(msg.reply) html = `<div class="reply">Reply: ${msg.reply}</div>`+html;
     }
+
+    div.innerHTML = html;
 
     div.addEventListener('click', ()=>{
       if(!msg.sticker){
@@ -122,26 +128,27 @@ chatRef.on('value', snap=>{
         replyText.innerText=msg.text;
       }
     });
+
     messagesDiv.appendChild(div);
   });
   messagesDiv.scrollTop=messagesDiv.scrollHeight;
 });
 
 // --- Cancel reply ---
-cancelReplyBtn.addEventListener('click', ()=>{ replyTo=null; replyPreview.style.display='none'; });
+cancelReplyBtn.addEventListener('click', ()=>{replyTo=null; replyPreview.style.display='none';});
 
-// --- Show status ---
+// --- Show both users' online status ---
 statusRef.on('value', snap=>{
-  let txt=[];
+  let statusTexts = [];
   ['Ishu','Billi'].forEach(user=>{
-    const val=snap.child(user).val();
-    txt.push(user+' - '+(val?.online?'online':'offline'));
+    const val = snap.child(user).val();
+    if(val) statusTexts.push(`${user} - ${val.online?'online':'offline'}`);
+    else statusTexts.push(`${user} - offline`);
   });
-  statusContainer.innerText=txt.join(' | ');
+  statusContainer.innerText = statusTexts.join(' | ');
 });
 
 // --- Sticker panel toggle ---
-stickerBtn.addEventListener('click', ()=>{ 
-  stickerPanel.style.display = stickerPanel.style.display==='flex'?'none':'flex'; 
-  stickerPanel.scrollTop = stickerPanel.scrollHeight;
+stickerBtn.addEventListener('click', ()=>{
+  stickerPanel.style.display = stickerPanel.style.display==='flex'?'none':'flex';
 });
