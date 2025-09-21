@@ -1,5 +1,5 @@
+/* General styles */
 * { box-sizing: border-box; margin:0; padding:0; font-family: 'Segoe UI', sans-serif; }
-
 body, html { height: 100%; background: #121212; color: #fff; }
 
 /* Overlay */
@@ -10,13 +10,10 @@ body, html { height: 100%; background: #121212; color: #fff; }
   display:flex; justify-content:center; align-items:center;
   z-index:9999;
 }
-
 .overlay-content {
   text-align:center; background:#023c00; padding:40px; border-radius:15px;
 }
-
 .overlay-content h2 { font-size:28px; margin-bottom:20px; color:#fff; }
-
 .user-btn {
   display:block; width:200px; padding:15px; margin:10px auto; font-size:18px;
   border-radius:25px; border:none; background:#025e00; color:white; font-weight:bold; cursor:pointer;
@@ -33,7 +30,7 @@ body, html { height: 100%; background: #121212; color: #fff; }
 .avatar { width:40px; height:40px; background:#25d366; border-radius:50%; margin-right:10px; }
 .header-info h2 { font-size:16px; }
 .typing-header { font-style:italic; color:#a0cfa0; font-size:12px; }
-.clear-btn { background:#25d366; border:none; padding:6px 12px; border-radius:20px; cursor:pointer; color:white; font-weight:bold; }
+.clear-btn, .sticker-btn { background:#25d366; border:none; padding:6px 12px; border-radius:20px; cursor:pointer; color:white; font-weight:bold; }
 
 /* Messages */
 .messages { flex:1; padding:15px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; background:#121212; }
@@ -50,6 +47,43 @@ body, html { height: 100%; background: #121212; color: #fff; }
 .input-container { display:flex; padding:10px 15px; border-top:1px solid #333; background:#1e1e1e; }
 .input-container input { flex:1; padding:10px 15px; border-radius:20px; border:1px solid #444; outline:none; font-size:14px; background:#121212; color:#fff; }
 .input-container button { margin-left:10px; padding:10px 20px; border-radius:20px; border:none; background:#25d366; color:white; cursor:pointer; }
+
+/* Sticker panel */
+.sticker-panel {
+  position: absolute;
+  bottom: 60px;
+  left: 15px;
+  right: 15px;
+  background: #1e1e1e;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  z-index: 100;
+}
+.sticker {
+  width: 40px;
+  height: 40px;
+  background-color: #333;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.sticker img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 5px;
+}
+.sticker:hover {
+  background-color: #444;
+}
+.sticker:active {
+  background-color: #555;
+}
 
 /* Scrollbar */
 .messages::-webkit-scrollbar { width:6px; }
